@@ -1,0 +1,27 @@
+windown
+	-	netstat -nao | find /i "estab" /c
+	- 	netstat -nao | find /i "time_wait" /c
+	-	netstat -nao | find /i "Name" /c	
+	
+linux
+
+UserParameter=sockstat.tcp.established,netstat -tu |grep ESTA -c
+UserParameter=sockstat.tcp.timewait,netstat -tu |grep TIME -c
+UserParameter=sockstat.sockets,cat /proc/net/sockstat|grep sockets|cut -d' ' -f 3
+
+
+
+#!/bin/bash
+# Script to print Linux TCP connections using netstat
+# Guthub: https://github.com/jmutai
+#  
+#    vvvv vvvv-- the code from above
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+echo ""
+echo -en "${RED} ALL TCP Connections Count: ${NC}\n"
+netstat -nat | awk '{print $6}' | sort | uniq -c | sort -r
+echo ""
+echo -en "${RED} Top CLOSE_WAIT state TCP Connections: ${NC}\n"
+netstat -apn | grep CLOSE_WAIT | awk '{ print $7 }' | sort | uniq -c | sort -nr | head -n 10
+
